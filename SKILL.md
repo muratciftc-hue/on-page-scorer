@@ -46,9 +46,46 @@ Kullanici su sekillerde giris yapabilir:
 
 ## Analiz Adimlari
 
-### Adim 1 — Sayfayi Fetch Et
+### Adim 1 — Sayfayi Fetch Et (Cascade Fetch Stratejisi)
 
-WebFetch ile hedef URL'i cek. Su bilgileri cikar:
+Sayfa icerigini almak icin asagidaki sirada dene. Bir yontem basarisiz
+olursa (bot korumasi, JS-only rendering, timeout, bos icerik) bir
+sonrakine gec. Kullaniciya hangi yontemle basarili oldugunu bildir.
+
+**Yontem 1 — WebFetch (varsayilan, en hizli)**
+WebFetch ile hedef URL'i cek. Cogu statik ve SSR sayfa icin calisir.
+Basarisizlik isaretleri: "Pardon Our Interruption", "Enable JavaScript",
+"Access Denied", "403 Forbidden", veya icerik <200 kelime geliyorsa.
+
+**Yontem 2 — Google Cache**
+WebFetch ile Google'in onbellege alinmis surumunu dene:
+`https://webcache.googleusercontent.com/search?q=cache:[URL]`
+Not: Google cache her zaman mevcut olmayabilir.
+
+**Yontem 3 — Google AMP / Lite**
+Bazi sayfalar AMP surumleri sunar. Dene:
+- `[URL]/amp` veya `[URL]?amp=1`
+- `[domain]/amp/[path]`
+
+**Yontem 4 — Ahrefs Crawled Content**
+Eger Ahrefs MCP bagli ise `mcp__ahrefs__site-audit-page-content` ile
+Ahrefs'in crawl ettigi HTML icerigini al. Bu, JS-rendered sayfalari
+bile kapsar cunku Ahrefs headless browser kullanir.
+
+**Yontem 5 — Chrome ile Fetch (son care)**
+Eger Chrome MCP (`mcp__Claude_in_Chrome__*`) bagli ise:
+- `tabs_create_mcp` ile yeni tab ac
+- `navigate` ile URL'ye git
+- `get_page_text` ile sayfa metnini al
+- `read_page` ile DOM yapisini al
+Bu yontem JS-rendered sayfalari ve bot korumali siteleri handler.
+
+**Basarisizlik durumu:**
+Hicbir yontem calismiyorsa kullaniciya bildir:
+"⚠️ Sayfa icerigi alinamadi. Site JS-only rendering ve agresif bot
+korumasi kullaniyor. Manuel kontrol oneriyorum: [URL]"
+
+Basarili fetch sonrasi su bilgileri cikar:
 - Title tag, meta description, canonical, OG tags
 - Tum heading'ler (H1-H6) icerikleriyle birlikte
 - Body text (ilk 5000 karakter), word count
