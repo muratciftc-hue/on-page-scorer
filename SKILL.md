@@ -13,7 +13,7 @@ argument-hint: "<url> <keyword>"
 license: MIT
 metadata:
   author: inbound-seo
-  version: "2.0.0"
+  version: "2.1.0"
   category: seo
   sources:
     - "theStacc Content Scoring Framework (2026)"
@@ -566,7 +566,9 @@ En Kritik Aksiyonlar (tum sayfalar icin):
 - Skor hesaplamasini YUKARIDAKI kurallara gore yap, tahmin etme
 - Her kontrol maddesi icin ✓ veya ✗ veya ~ isle, gercek degeri goster
 - Aksiyon onerileri TURKCE ve SOMUT olsun — "sunu su sekilde degistir" formatinda
-- WebFetch ile sayfayi fetch edemezsen kullaniciya hatayi bildir
+- Dual-fetch kullan: Katman A (curl raw HTML → schema, meta) + Katman B (WebFetch → icerik)
+- WebFetch ile sayfayi fetch edemezsen cascade sirasini takip et (Google Cache → Ahrefs → Chrome)
+- Schema verisini HER ZAMAN curl raw HTML'den al — WebFetch script tag'lari siler
 - Keyword karsilastirmasi buyuk-kucuk harf duyarsiz yapilmali
 - FAQ schema onerme (gov/health haric kisitli), HowTo schema onerme (deprecated)
 - Keyword density'yi ranking faktoru olarak sunma, sanity check olarak kullan

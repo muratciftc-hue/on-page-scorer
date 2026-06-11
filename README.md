@@ -4,8 +4,12 @@ AI-powered on-page SEO scoring system for Claude Code. Analyzes any web page aga
 
 ## Installation
 
-Copy the `on-page-scorer` folder into your Claude Code skills directory:
+**Option 1 — Git clone (recommended):**
+```bash
+git clone https://github.com/muratciftc-hue/on-page-scorer.git ~/.claude/skills/on-page-scorer
+```
 
+**Option 2 — Manual copy:**
 ```bash
 cp -r on-page-scorer ~/.claude/skills/
 ```
@@ -21,6 +25,24 @@ cp -r on-page-scorer ~/.claude/skills/
 ```
 /on-page-scorer https://example.com/page1 https://example.com/page2 target-keyword
 ```
+
+## How It Fetches Pages (Dual-Fetch)
+
+This skill uses a two-layer fetch strategy to ensure accurate data:
+
+| Layer | Method | What It Gets | Why |
+|-------|--------|-------------|-----|
+| **A** | `curl` + raw HTML | JSON-LD schema, meta tags, microdata | WebFetch strips `<script>` tags during markdown conversion |
+| **B** | WebFetch (cascade) | Word count, headings, links, CTA, images | Content analysis needs clean text |
+
+### Cascade Fallback (Layer B)
+
+If WebFetch fails (bot protection, JS-only rendering), it tries:
+
+1. **WebFetch** — default, fastest
+2. **Google Cache** — cached version of the page
+3. **Ahrefs Cache** — if Ahrefs MCP is connected
+4. **Chrome MCP** — renders JS, bypasses bot protection (requires Claude in Chrome extension)
 
 ## Scoring Categories
 
@@ -45,6 +67,17 @@ cp -r on-page-scorer ~/.claude/skills/
 | 40-59 | Weak | Rewrite within 14 days |
 | 0-39 | Critical | Immediate intervention |
 
+## Requirements
+
+- Claude Code CLI or Claude Code Desktop
+- `python3` (for raw HTML schema parsing — pre-installed on macOS/Linux)
+- `curl` (for raw HTML fetching — pre-installed on macOS/Linux)
+
+### Optional (for better coverage)
+
+- **Ahrefs MCP server** — fallback fetch via crawled content
+- **Claude in Chrome extension** — JS-rendered and bot-protected sites
+
 ## Methodology Sources
 
 - [theStacc Content Scoring Framework (2026)](https://thestacc.com/blog/content-scoring-guide/)
@@ -56,10 +89,9 @@ cp -r on-page-scorer ~/.claude/skills/
 - [Portent Readability Study](https://portent.com/blog/content/study-how-content-readability-affects-seo-and-rankings.htm)
 - [WiserNotify CTA Statistics (2026)](https://wisernotify.com/blog/call-to-action-stats/)
 
-## Requirements
+## Related Skills
 
-- Claude Code CLI or Claude Code Desktop
-- WebFetch tool access (for fetching page HTML)
+- [serp-analyzer](https://github.com/muratciftc-hue/serp-analyzer) — SERP analysis with competitor comparison
 
 ## License
 
